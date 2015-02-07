@@ -1,0 +1,39 @@
+{% extends "master.html" %}
+{% block content %}
+    <div class="row">
+      <div class="large-4 columns">
+          {% if name %}
+            <h1>Hello {{ name }}!</h1>
+          {% else %}
+            <h1>Hello World!</h1>
+         {% endif %}
+      </div>
+    </div>
+    <div class="row">
+        <div class="large-4 columns">
+            {% for message in get_flashed_messages() %}
+            <div data-alert class="alert-box radius">
+                {{ message }}
+                <a href="#" class="close">&times;</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="large-4 columns">
+            <form method="post" action="/">
+                {{ form.csrf_token }}
+                {{ form.name.label }} {{ form.name(placeholder="Name") }}
+                {{ form.time.label }} {{ form.time(placeholder="Time") }}
+                {{ form.submit(class="button") }}
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/static/js/foundation.alert.js"></script>
+{% endblock %}

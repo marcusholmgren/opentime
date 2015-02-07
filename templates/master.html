@@ -1,0 +1,22 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Marcus Flasky App | Welcome</title>
+    <link rel="stylesheet" href="/static/css/foundation.min.css" />
+  </head>
+  <body>
+    
+    {% block content %}
+    {% endblock %}
+
+    {% block scripts %}
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js"></script>
+    <script src="/static/js/foundation.min.js"></script>
+    {% endblock %}
+    <script>
+      $(document).foundation();
+    </script>
+  </body>
+</html>
