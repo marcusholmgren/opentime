@@ -3,8 +3,8 @@
 # Import the Flask Framework
 from flask import Flask, render_template, session, redirect, url_for, flash
 from flask.ext.wtf import Form
-from wtforms import DecimalField, StringField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms import DateField, DecimalField, StringField, SubmitField, validators
+import datetime
 from google.appengine.ext import ndb
 from config import SECRET_KEY
 
@@ -19,37 +19,56 @@ class TimeEntry(ndb.Model):
 
 
 class DayModule(ndb.Model):
-    day = ndb.StringProperty()
+    day = ndb.StringProperty(required=True)
     date = ndb.DateTimeProperty(auto_now_add=True)
     details = ndb.LocalStructuredProperty(TimeEntry, repeated=True)
 
+    def __repr__(self):
+        return "[{0} {1}]".format(self._class_name(), self.day)
 
-class NameForm(Form):
-    name = StringField('What is your name?', validators=[DataRequired()])
-    time = DecimalField('Worked hours:', validators=[DataRequired()])
-    submit = SubmitField('Submit')
+    @staticmethod
+    def create():
+        now = datetime.datetime.now().strftime("%Y-%m-%d")
+        return DayModule(day=now)
+
+    def add_time(self, code, time):
+        te = None
+        for entry in self.details:
+            if entry.code == code:
+                te = entry
+        if te:
+            te.time += time
+        else:
+            self.details.append(TimeEntry(code=code, time=time))
+
+
+class TimeEntryForm(Form):
+    day = DateField(u'Day', validators=[validators.InputRequired(message="Please provide a day")])
+    code = StringField(u'Time code', validators=[validators.InputRequired()])
+    time = DecimalField(u'Worked hours:', validators=[validators.InputRequired()])
+    submit = SubmitField(u'Submit')
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    form = NameForm()
+    form = TimeEntryForm()
     if form.validate_on_submit():
-        old_name = session.get('name')
+        old_name = session.get('code')
         if old_name is not None and old_name != form.name.data:
             flash('Looks like you have changed your name!')
         app.logger.debug("Form validate name %s" % form.name.data)
-        session['name'] = form.name.data
+        session['code'] = form.name.data
         form.name.data = ''
         return redirect(url_for('index'))
     #app.logger.debug("Index method called. Name is %s" % session.get("name"))
-    return render_template('index.html', form=form, name=session.get('name'))
+    return render_template('index.html', form=form, name=session.get('code'))
 
 
 @app.route('/hello/')
 @app.route('/hello/<name>')
 def hello(name=None):
     app.logger.debug("Hello method called name: %s" % name)
-    return render_template('index.html', name=name, form=NameForm())
+    return render_template('index.html', name=name, form=TimeEntryForm())
 
 
 @app.errorhandler(404)

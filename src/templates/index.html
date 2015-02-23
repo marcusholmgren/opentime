@@ -10,7 +10,7 @@
       </div>
     </div>
     <div class="row">
-        <div class="large-4 columns">
+        <div class="large-6 columns">
             {% for message in get_flashed_messages() %}
             <div data-alert class="alert-box radius">
                 {{ message }}
@@ -18,13 +18,23 @@
             </div>
             {% endfor %}
         </div>
+    {% if form.errors %}
+        <ul class="error">
+        {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+            {% for error in field_errors %}
+            <li>{{ form[field_name].label }}: {{ error }}</li>
+            {% endfor %}
+        {% endfor %}
+        </ul>
+    {% endif %}
     </div>
 
     <div class="row">
         <div class="large-4 columns">
             <form method="post" action="/">
                 {{ form.csrf_token }}
-                {{ form.name.label }} {{ form.name(placeholder="Name") }}
+                {{ form.day.label }} {{ form.day(placeholder="Day") }}
+                {{ form.code.label }} {{ form.code(placeholder="Time code") }}
                 {{ form.time.label }} {{ form.time(placeholder="Time") }}
                 {{ form.submit(class="button") }}
             </form>

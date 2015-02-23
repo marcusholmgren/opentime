@@ -12,6 +12,12 @@ Then using:
 [WTForms][4]
 
 
+## Test
+
+[Local Unit Testing for Python][localunittesting]
+
+$ python appengine_testrunner.py /usr/local/google_appengine tests/
+
 ## Licensing
 See [LICENSE](LICENSE)
 
@@ -21,3 +27,4 @@ See [LICENSE](LICENSE)
 [2]: http://flask.pocoo.org "Flask micro framework"
 [3]: http://jinja.pocoo.org "Jinja2 is a full featured template engine for Python"
 [4]: http://wtforms.readthedocs.org/en/latest/# "WTForms Documentation"
+[localunittesting]: https://cloud.google.com/appengine/docs/python/tools/localunittesting "Local Unit Testing for Python"
