@@ -2,10 +2,10 @@
 import os
 import unittest
 import datetime
-from src import appengine_config
-from src.main import DayModule, TimeEntry
-from google.appengine.ext import testbed
+from google.appengine.ext import testbed, vendor
+vendor.add('./src/lib')
 
+from src.main import DayModule, TimeEntry
 
 class TestCase(unittest.TestCase):
     def setUp(self):
