@@ -4,7 +4,7 @@
 from flask import Flask, render_template, session, redirect, url_for, flash
 from flask.ext.wtf import Form
 from wtforms import DateField, DecimalField, StringField, SubmitField, validators
-import datetime
+import datetime 
 from google.appengine.ext import ndb
 from config import SECRET_KEY
 
@@ -16,6 +16,9 @@ app.config['SECRET_KEY'] = SECRET_KEY
 class TimeEntry(ndb.Model):
     code = ndb.StringProperty()
     time = ndb.FloatProperty()
+
+    def __repr__(self):
+        return "[{0} {1}]".format(self._class_name, self.code)
 
 
 class DayModule(ndb.Model):
@@ -43,7 +46,7 @@ class DayModule(ndb.Model):
 
 
 class TimeEntryForm(Form):
-    day = DateField(u'Day', validators=[validators.InputRequired(message="Please provide a day")])
+    day = DateField(u'Day', default=datetime.date.today(), validators=[validators.InputRequired(message="Please provide a day")])
     code = StringField(u'Time code', validators=[validators.InputRequired()])
     time = DecimalField(u'Worked hours:', validators=[validators.InputRequired()])
     submit = SubmitField(u'Submit')
@@ -53,15 +56,15 @@ class TimeEntryForm(Form):
 def index():
     form = TimeEntryForm()
     if form.validate_on_submit():
-        old_name = session.get('code')
-        if old_name is not None and old_name != form.name.data:
-            flash('Looks like you have changed your name!')
-        app.logger.debug("Form validate name %s" % form.name.data)
-        session['code'] = form.name.data
-        form.name.data = ''
+        old_code = session.get('code')
+        if old_code is not None and old_code != form.code.data:
+            flash('Looks like you have changed project code!')
+        app.logger.debug("Form validate name %s" % form.code.data)
+        session['code'] = form.code.data
+        form.code.data = ''
         return redirect(url_for('index'))
     #app.logger.debug("Index method called. Name is %s" % session.get("name"))
-    return render_template('index.html', form=form, name=session.get('code'))
+    return render_template('register_time.html', form=form, name=session.get('code'))
 
 
 @app.route('/hello/')
@@ -80,4 +83,5 @@ def page_not_found(e):
 @app.errorhandler(500)
 def page_not_found(e):
     """Return a custom 500 error."""
+    app.logger.error('Unexpected error: {}'.format(e))
     return 'Sorry, unexpected error: {}'.format(e), 500

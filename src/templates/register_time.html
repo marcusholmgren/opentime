@@ -1,0 +1,86 @@
+{% extends "master.html" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="large-6 columns">
+            {% for message in get_flashed_messages() %}
+            <div data-alert class="alert-box radius">
+                {{ message }}
+                <a href="#" class="close">&times;</a>
+            </div>
+            {% endfor %}
+        </div>
+    {% if form.errors %}
+        <ul class="error">
+        {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+            {% for error in field_errors %}
+            <li>{{ form[field_name].label }}: {{ error }}</li>
+            {% endfor %}
+        {% endfor %}
+        </ul>
+    {% endif %}
+    </div>
+
+    <div class="row">
+        <div class="large-4 small-12 columns">
+            <form method="post" action="/">
+                {{ form.csrf_token }}
+                {{ form.day.label }} {{ form.day(placeholder="Day", type="date") }}
+                {{ form.code.label }} {{ form.code(placeholder="Time code") }}
+                <div class="row">
+                    <div class="large-8 columns">
+                        {{ form.time.label }} {{ form.time(placeholder="Worked hours", type="time") }}
+                    </div>
+                    <div class="large-2 columns"><a id="addition" href="#" class="small button success">+</a></div>
+                    <div class="large-2 columns"><a id="subtract" href="#" class="small button alert">-</a></div>
+                </div>
+                {{ form.submit(class="button") }}
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/static/js/foundation.alert.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script>
+        (function() {
+          var $addButton, $subtractButton, $timeField, currentTime;
+
+          $timeField = $("#time");
+
+          currentTime = function() {
+            var currentValue;
+            currentValue = parseInt($timeField.val());
+            if (currentValue) {
+              return currentValue;
+            } else {
+              return 0;
+            }
+          };
+
+          $addButton = $("#addition");
+
+          $addButton.click(function() {
+            return $timeField.val(currentTime() + 1);
+          });
+
+          $subtractButton = $("#subtract");
+
+          $subtractButton.click(function() {
+            return $timeField.val(currentTime() - 1);
+          });
+
+        }).call(this);
+    </script>
+      <script>
+      $(function() {
+        $( "#day" ).datepicker({ dateFormat: "yy-mm-dd" });
+      });
+      </script>
+{% endblock %}
